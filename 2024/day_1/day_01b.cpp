@@ -9,6 +9,7 @@
 #include <numeric>
 #include <ostream>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 int main() {
@@ -29,6 +30,7 @@ int main() {
   std::vector<int> col1;
   std::vector<int> col2;
   std::vector<int> similarity;
+  std::unordered_map<int, int> frequency_2;
 
   while (std::getline(file, my_line)) {
     std::size_t splitter = my_line.find(" ");
@@ -37,24 +39,19 @@ int main() {
         std::stoi(my_line.substr(splitter + 1, my_line.size() - splitter - 1)));
   }
 
-  // looping through the first column, checking if in second column
-  for (int i = 0; i < col1.size(); ++i) {
-    int counter = 0;
-    // checking if val exists first:
-    // declaring iterator
-    std::vector<int>::iterator it;
-    it = std::find(col2.begin(), col2.end(), col1[i]);
-    if (it == col2.end()) {
-      /*std::cout << "Element " << col1[i] << " not found in array 2" << "\n";*/
-      similarity.push_back(counter);
+  // Build a map for frequency in col 2
+  for (int i = 0; i < col2.size(); i++) {
+    frequency_2[col2[i]]++;
+  }
+
+  // Check the similarity between col[i] and it->second
+  for (int i = 0; i < col1.size(); i++) {
+    auto iter = frequency_2.find(col1[i]);
+    if (iter == frequency_2.end()) {
+      similarity.push_back(0);
     } else {
-      for (int j = 0; j < col2.size(); ++j) {
-        if (col2[j] == col1[i]) {
-          counter++;
-        }
-      }
-      /*std::cout << col1[i] << " appears in col2 " << counter << " times\n";*/
-      similarity.push_back(col1[i] * counter);
+      int counter = iter->second;
+      similarity.push_back(counter * col1[i]);
     }
   }
 
