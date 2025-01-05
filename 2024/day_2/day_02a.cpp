@@ -16,7 +16,6 @@ int main(int argc, char *argv[]) {
   (void)argv;
 
   // read in file
-  /*std::string input_file = "./sample_input.txt";*/
   std::string input_file = "./input.txt";
   std::ifstream file(input_file);
 
@@ -44,9 +43,6 @@ int main(int argc, char *argv[]) {
     loop_counter++;
     if (valid_level) {
       safe_counter++;
-      /*std::cout << "Row " << loop_counter << " is safe" << "\n";*/
-    } else {
-      /*std::cout << "Row " << loop_counter << " NOT WORKING!!" << "\n";*/
     }
   }
   // print out our results:
@@ -58,7 +54,6 @@ bool isValid(std::vector<int> int_line) {
 
   bool is_asc_desc = false;
 
-  /*std::cout << "FULL STRING " << std::endl;*/
   // checking ascending
   if (std::is_sorted(int_line.begin(), int_line.end())) {
     is_asc_desc = true;
@@ -73,7 +68,6 @@ bool isValid(std::vector<int> int_line) {
 
   if (is_asc_desc == false) {
     return false;
-    std::cout << "is asc or desc" << "\n";
   }
 
   // checking that numbers are not the same and in range
