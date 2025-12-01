@@ -9,7 +9,6 @@
 #include <vector>
 
 int main() {
-
   // setting input file as a string
   /*std::string input = "./sample_input_a";*/
   std::string input = "./input_a.txt";
@@ -38,13 +37,12 @@ int main() {
   // checking that both cols are the same size
   if (col1.size() == col2.size()) {
     for (int i = 0; i < col1.size(); i++) {
-      auto const &num1 = col1[i];
-      auto const &num2 = col2[i];
+      auto const& num1 = col1[i];
+      auto const& num2 = col2[i];
       /*std::cout << col1[i] << " " << col2[i] << std::endl;*/
       sum += std::abs(num2 - num1);
     }
-  }
-  else{
+  } else {
     std::printf("Columns are different lengths");
   }
   // return our result
