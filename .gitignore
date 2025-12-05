@@ -35,3 +35,6 @@
 # year 24
 2024/
 ./2024/
+
+# input files
+*input.txt
