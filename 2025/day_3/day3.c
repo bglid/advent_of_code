@@ -1,11 +1,51 @@
+#include <inttypes.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-int64_t battery_window(char *line) {
+int64_t battery_window(char *line, int64_t line_length) {
   // doing a sliding window approach
+  int l = 0;
+  int r = l + 1;
+  int single = 0;
+  int doub = 0;
+  int64_t curr = 0;
+  int64_t biggest = 0;
+
+  if (r >= line_length) {
+    printf("Error in reading right pointer: %d\n", r);
+    exit(EXIT_FAILURE);
+  }
+
+  while (r < line_length) {
+    // get digits with arithmetric manipultaion
+    single = line[r] - '0';
+    doub = line[l] - '0';
+    // concatenating digits
+    curr = doub * 10 + single;
+
+    // comparing to current res, sliding window-esq
+    if (curr >= biggest) {
+      biggest = curr;
+    }
+    if (single > doub && r < line_length) {
+      l = r;
+    }
+
+    if (r > line_length) {
+      return biggest;
+    }
+
+    r++;
+    // if (r % 5 == 0) {
+    //   printf("Final values: \nL %d %d\nR %d %d\nCurr: %" PRId64 "\n", l,
+    //   single,
+    //          r, doub, curr);
+    // }
+  }
+  return biggest;
 }
 
 int main(int argc, char *argv[]) {
@@ -42,22 +82,30 @@ int main(int argc, char *argv[]) {
   }
   fseek(fptr, 0, SEEK_SET);
 
-  // using off end to get size of file
-  // file_size = (size_t)eof;
   // rewind to start of file
   rewind(fptr);
 
-  printf("line length: %lu\n", line_length);
+  printf("line length: %" PRId64 "\n", line_length);
   // allocating buffer for each line
-  char *buff = calloc(line_length, sizeof *buff);
-  while (fgets(buff, line_length + 2, fptr) != NULL) {
-    // print line if newline
-    printf("Line: %s\n", buff);
-    // updating res with sliding window
-    res += battery_window(buff);
+  char *buff = calloc((size_t)line_length + 2, sizeof *buff);
+
+  if (!buff) {
+    exit(EXIT_FAILURE);
   }
 
-  printf("Total joltage: %lu", res);
+  while (fgets(buff, line_length + 2, fptr) != NULL) {
+    // getting line length
+    int n = strlen(buff);
+    // decrementing n for our window algo
+    if (n && buff[n - 1] == '\n') {
+      buff[n - 1] = '\0';
+      n--;
+    }
+    // updating res with sliding window
+    res += battery_window(buff, (int64_t)n);
+  }
+
+  printf("\nTotal joltage: %" PRId64 "\n", res);
 
   fclose(fptr);
   free(buff);
