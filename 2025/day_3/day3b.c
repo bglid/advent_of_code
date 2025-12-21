@@ -6,35 +6,45 @@
 #include <string.h>
 
 int64_t total_jolts(char *buff, int64_t line_length) {
-
   int jolt_index = 0;
-  char res[12];
+  char res[13];
   int start = 0;
 
-  printf("%lu", line_length);
   // iterate through the 12 possible digits
   for (int i = 0; i < 12; i++) {
+    int k = 12 - i;
+    int end = line_length - k;
     // iterate through remaining potential positions
     char max_num = '0';
-    for (int j = start; j < line_length - 12 + i; j++) {
+    for (int j = start; j <= end; j++) {
+      if (j >= line_length) {
+        break;
+      }
       // get max digit and position
       if (buff[j] > max_num) {
         max_num = buff[j];
         start = j;
       }
+      if (buff[j] == '9') {
+        break;
+      }
     }
-    if (jolt_index > 12) {
+    if (jolt_index >= 12) {
       printf("Issue with indexing");
       exit(EXIT_FAILURE);
     }
-    res[jolt_index] = max_num;
-    jolt_index++;
-    start++;
+    if (max_num != '0') {
+      res[jolt_index] = max_num;
+      jolt_index++;
+      start++;
+    }
     // printf("max position: %d\n", start);
   }
   // update and create the resulting jolt num
-  int64_t jolts = atol(res);
-  printf("res: %" PRId64 "\n", jolts);
+  int64_t jolts = 0;
+  for (int val = 0; val < 12; val++) {
+    jolts = 10 * jolts + res[val] - '0';
+  }
   return jolts;
 }
 
