@@ -8,10 +8,10 @@ day3b: day3b.o
 	$(CC) $(CFLAGS) -o day3b day3b.o
 
 run: day3
-	./day3 ./sample.txt
-	./day3 ./input.txt
-	# ./day3b ./sample.txt
-	# ./day3b ./input.txt
+	# ./day3 ./sample.txt
+	# ./day3 ./input.txt
+	./day3b ./sample.txt
+	./day3b ./input.txt
 	
 clean:
 	rm -f day3 *.o
