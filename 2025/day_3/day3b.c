@@ -5,45 +5,32 @@
 #include <stdlib.h>
 #include <string.h>
 
-int64_t total_jolts(char *buff, int64_t line_length) {
-  int jolt_index = 0;
-  char res[13];
-  int start = 0;
+// stack approach
+int64_t total_jolts(const char *buff, size_t line_length, size_t k) {
+  // chars to remove
+  size_t to_remove = (k < line_length) ? (line_length - k) : 0;
 
-  // iterate through the 12 possible digits
-  for (int i = 0; i < 12; i++) {
-    int k = 12 - i;
-    int end = line_length - k;
-    // iterate through remaining potential positions
-    char max_num = '0';
-    for (int j = start; j <= end; j++) {
-      if (j >= line_length) {
-        break;
-      }
-      // get max digit and position
-      if (buff[j] > max_num) {
-        max_num = buff[j];
-        start = j;
-      }
-      if (buff[j] == '9') {
-        break;
-      }
+  // init stack
+  char *stack = malloc(line_length * sizeof(int));
+  size_t top = 0;
+
+  // pop and add in order
+  for (size_t i = 0; i < line_length; i++) {
+    char num = buff[i];
+    // placing into the stack correctly
+    while (top > 0 && to_remove > 0 && stack[top - 1] < num) {
+      top--;
+      to_remove--;
     }
-    if (jolt_index >= 12) {
-      printf("Issue with indexing");
-      exit(EXIT_FAILURE);
-    }
-    if (max_num != '0') {
-      res[jolt_index] = max_num;
-      jolt_index++;
-      start++;
-    }
-    // printf("max position: %d\n", start);
+    stack[top++] = num;
   }
-  // update and create the resulting jolt num
-  int64_t jolts = 0;
-  for (int val = 0; val < 12; val++) {
-    jolts = 10 * jolts + res[val] - '0';
+
+  // build jolt number with k digits
+  uint64_t jolts;
+  size_t digits = (top < k) ? top : k;
+
+  for (size_t j = 0; j < digits; j++) {
+    jolts = jolts * 10 + (stack[j] - '0');
   }
   return jolts;
 }
@@ -95,14 +82,14 @@ int main(int argc, char *argv[]) {
 
   while (fgets(buff, line_length + 2, fptr) != NULL) {
     // getting line length
-    int n = strlen(buff);
+    size_t n = strlen(buff);
     // decrementing n for our window algo
     if (n && buff[n - 1] == '\n') {
       buff[n - 1] = '\0';
       n--;
     }
     // updating res with sliding window
-    res += total_jolts(buff, (int64_t)n);
+    res += total_jolts(buff, n, 12);
   }
 
   printf("\nTotal joltage: %" PRId64 "\n", res);
