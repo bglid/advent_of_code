@@ -4,105 +4,41 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/types.h>
 
-int MAX_PAPER = 4;
-
-enum Direction {
-  UP_LEFT,
-  UP,
-  UP_RIGHT,
-  RIGHT,
-  DOWN_RIGHT,
-  DOWN,
-  DOWN_LEFT,
-  LEFT,
+static const int MAX_PAPER = 4;
+static const int dirs[8][2] = {
+    {-1, -1}, {-1, 0}, {-1, 1}, {0, -1}, {0, 1}, {1, -1}, {1, 0}, {1, 1},
 };
 
-// Give back the char at that direction from the value in the grid.
-char get_direction(char **grid, size_t i, size_t j, enum Direction d) {
-  char res;
-  switch (d) {
-  case UP_LEFT:
-    res = grid[i - 1][j - 1];
-    break;
-  case UP:
-    res = grid[i - 1][j];
-    break;
-  case UP_RIGHT:
-    res = grid[i - 1][j + 1];
-    break;
-  case RIGHT:
-    res = grid[i][j + 1];
-    break;
-  case DOWN_RIGHT:
-    res = grid[i + 1][j + 1];
-    break;
-  case DOWN:
-    res = grid[i + 1][j];
-    break;
-  case DOWN_LEFT:
-    res = grid[i + 1][j - 1];
-    break;
-  case LEFT:
-    res = grid[i][j - 1];
-    break;
-  // bad dir
-  default:
-    printf("INVALID DIRECTION: grid[%zu][%zu]", i, j);
-  }
-  return res;
-}
+// Give back true if direction is valid.
+bool check_coords(char **grid, size_t rows, size_t cols, size_t i, size_t j,
+                  int d, char *out) {
+  // get coordinates
+  int ni = (int)i + dirs[d][0];
+  int nj = (int)j + dirs[d][1];
 
-int32_t check_roll(char input) {
-  if (input == '@') {
-    return 1;
+  // bounds checking
+  if (ni < 0 || nj < 0 || ni >= (int)rows || nj >= (int)cols) {
+    return false;
   }
-  return 0;
+
+  *out = grid[ni][nj];
+  return true;
 }
 
 // i = rows, j = cols
-bool count_rolls(char **grid, size_t i, size_t j, size_t rows, size_t cols) {
+bool is_valid_roll(char **grid, size_t i, size_t j, size_t rows, size_t cols) {
   int32_t count = 0;
-  // all the ups
-  if (i > 0) {
-    char up = get_direction(grid, i, j, UP);
-    count += check_roll(up);
-    if (j > 0) {
-      char up_left = get_direction(grid, i, j, UP_LEFT);
-      count += check_roll(up_left);
-    }
-    if (j < cols) {
-      char up_right = get_direction(grid, i, j, UP_RIGHT);
-      count += check_roll(up_right);
+  char out_res;
+
+  // 8 = num directions
+  for (int k = 0; k < 8; k++) {
+    if (check_coords(grid, rows, cols, i, j, k, &out_res) && out_res == '@') {
+      count++;
     }
   }
-  // left and right
-  if (j > 0) {
-    char left = get_direction(grid, i, j, LEFT);
-    count += check_roll(left);
-  }
-  if (j < cols) {
-    char right = get_direction(grid, i, j, RIGHT);
-    count += check_roll(right);
-  }
-  // all the downs
-  if (i < rows) {
-    char down = get_direction(grid, i, j, DOWN);
-    count += check_roll(down);
-    if (j > 0) {
-      char down_left = get_direction(grid, i, j, DOWN_LEFT);
-      count += check_roll(down_left);
-    }
-    if (j < cols) {
-      char down_right = get_direction(grid, i, j, DOWN_RIGHT);
-      count += check_roll(down_right);
-    }
-  }
-  if (count < MAX_PAPER) {
-    return true;
-  }
-  return false;
+
+  return count < MAX_PAPER;
 }
 
 // Destroy grid freeing elements then grid.
@@ -115,7 +51,7 @@ void destroy_grid(char **grid, size_t rows) {
 
 int main(int argc, char *argv[]) {
   if (argc != 2) {
-    printf("Need input file to run");
+    printf("Need input file to run\n");
     exit(EXIT_FAILURE);
   }
 
@@ -142,7 +78,7 @@ int main(int argc, char *argv[]) {
 
     char *row = malloc(len + 1);
     if (row == NULL) {
-      printf("error malloc row");
+      fprintf(stderr, "error malloc row\n");
       exit(EXIT_FAILURE);
     }
     memcpy(row, line, len + 1);
@@ -150,7 +86,7 @@ int main(int argc, char *argv[]) {
     // realloc mem for dynamic grid
     char **tmp = realloc(grid, (rows + 1) * sizeof(*grid));
     if (tmp == NULL) {
-      printf("error realloc");
+      fprintf(stderr, "error realloc\n");
       exit(EXIT_FAILURE);
     }
 
@@ -159,12 +95,11 @@ int main(int argc, char *argv[]) {
   }
 
   int32_t count = 0;
-  printf("rows: %zu\n\n", rows);
   // getting forklift counts
   for (size_t i = 0; i < rows; i++) {
     for (size_t j = 0; j < cols; j++) {
       if (grid[i][j] == '@') {
-        count += count_rolls(grid, i, j, rows - 1, cols);
+        count += is_valid_roll(grid, i, j, rows, cols);
       }
     }
   }
