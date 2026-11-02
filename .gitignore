@@ -1,41 +1,24 @@
-# Prerequisites
-*.d
+# WHITELIST IGNORE EVERYTHING DEFAULT
+* 
 
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
+# Allow directory traversal
+!*/
 
-# Precompiled Headers
-*.gch
-*.pch
+# Repository files
+!.gitignore
+!*.md
+!LICENSE
+!README
+!README.*
+!Makefile
 
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
+# Source code
+!*.c
+!*.cpp
+!*.h
+!*.py
+!*.sh
+!*.pl
 
-# Fortran module files
-*.mod
-*.smod
-
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
-
-# Executables
-*.exe
-*.out
-*.app
-
-
-# year 24
-2024/
-./2024/
-
-# input files
-*input.txt
-*.txt
+# Test fixtures
+!*.txt
